@@ -45,7 +45,7 @@ Imagine you are uploading a 10MB PDF called `secret_plans.pdf` to Haven. Here is
 
 ---
 
-## 2. What Exactly Will You Be Coding?
+## 2. What Exactly Will Be Coded?
 
 Here is the specific code you will write and the concepts you will master:
 
@@ -70,6 +70,3 @@ Here is the specific code you will write and the concepts you will master:
 Most tutorials teach you to build a "Toy App".
 *   *Toy App:* User logs in -> Server checks DB -> Server returns data.
 *   *Haven:* User logs in (Server doesn't know password) -> Client asks for encrypted blob -> Server returns blob -> Client decrypts.
-
-You are building a system where **Functionality** is moved from the Backend to the **Client**.
-This is the architecture of the future (Web3, Edge Computing, Local-First Software).
