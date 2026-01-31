@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Haven.Core/Haven.Core.csproj" />
+  <Project Path="Haven.Tests/Haven.Tests.csproj" />
+</Solution>

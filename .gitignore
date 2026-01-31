@@ -1,0 +1,53 @@
+# ================================
+# .NET SDK (.NET 9) + .slnx
+# ================================
+
+## Build output
+bin/
+obj/
+
+## Solution / IDE state
+.vs/
+.idea/
+.vscode/
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Test & coverage
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+## NuGet
+packages/
+*.nupkg
+*.snupkg
+.nuget/
+
+## dotnet tools
+.dotnet/
+
+## Publish / artifacts
+publish/
+artifacts/
+
+## Logs & temp
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Secrets / env
+.env
+.env.*
+secrets.json
