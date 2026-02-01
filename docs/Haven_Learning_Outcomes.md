@@ -1,6 +1,6 @@
-# What You Will Learn with Haven
+# How its made
 
-Building Haven is an advanced software engineering project. It moves beyond simple "CRUD" (Create, Read, Update, Delete) apps into the realm of **Systems Programming**, **Cryptography**, and **Distributed Systems**.
+Building Haven is an advanced software engineering project. It moves beyond simple "CRUD" (Create, Read, Update, Delete) apps and into **Systems Programming**, **Cryptography**, and **Distributed Systems**.
 
 ## 1. Cryptography & Security
 You will move from "using auth libraries" to understanding how secure systems are built from scratch.
@@ -11,14 +11,8 @@ You will move from "using auth libraries" to understanding how secure systems ar
     *   **XSalsa20-Poly1305:** For symmetric file encryption.
 *   **Key Derivation:** implementing **Scrypt** to turn a password into a secure master key.
 
-## 2. Advanced .NET 9 & C#
-This isn't just basic ASP.NET. You will use high-performance features.
-*   **Memory Management:** Using `Span<T>` and `Memory<T>` to handle file chunks without allocating massive amounts of RAM.
-*   **Clean Architecture:** Separating your Core logic (Crypto/Nodes) from the Infrastructure (IPFS/ASP.NET) to make the code testable and portable.
-*   **Binary Protocols:** Handling raw binary data streams instead of just JSON strings.
-
 ## 3. Distributed System Design
-You will learn how modern decentralized networks (like IPFS, BitTorrent, and Git) work under the hood.
+You will see how modern decentralized networks (like IPFS, BitTorrent, and Git) work under the hood.
 *   **Merkle Trees:** How to verify a large file structure using a single hash (the Root Hash).
 *   **Content-Addressing:** Why pointing to data by its *Hash* (CID) is better than its *Location* (URL).
 *   **HAMT (Hash Array Mapped Trie):** Implementing a complex data structure to handle folders with millions of files efficiently.
