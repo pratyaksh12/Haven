@@ -1,10 +1,8 @@
 # Haven Deep Dive: The Mechanics
 
-You asked for more detail. Let's break down exactly what happens under the hood.
-
 ## 1. The "Life of a File" (Step-by-Step)
 
-Imagine you are uploading a 10MB PDF called `secret_plans.pdf` to Haven. Here is the millisecond-by-millisecond journey:
+Imagine you are uploading a 10MB PDF called `secret_plans.pdf` to Haven.
 
 ### Step A: The Split (Client-Side)
 1.  **Browser/Client:** Reads the file into memory.
@@ -17,7 +15,7 @@ Imagine you are uploading a 10MB PDF called `secret_plans.pdf` to Haven. Here is
 4.  **Encryption:**
     *   `EncryptedChunk1` = `XSalsa20(Chunk1, Key=Derived(K_{file}))`
     *   `EncryptedChunk2` = `XSalsa20(Chunk2, Key=Derived(K_{file}))`
-    *   *Note:* The output looks like random static. No one can tell it's a PDF.
+    *   *Note:* The output looks like random static.
 
 ### Step C: Hashing (Client-Side)
 5.  **Addressing:** We calculate the Hash (SHA-256) of the *encrypted* chunks.
@@ -47,21 +45,13 @@ Imagine you are uploading a 10MB PDF called `secret_plans.pdf` to Haven. Here is
 
 ## 2. What Exactly Will Be Coded?
 
-Here is the specific code you will write and the concepts you will master:
-
-### A. High-Performance Encryption
-*   **The Problem:** Encrypting 5MB chunks in a loop in C# can start generating "Garbage".
-*   **The Solution:** You will use **`Span<byte>`**.
-    *   Instead of `byte[] chunk = new byte[5_000_000]`, you will interpret memory directly without copying it.
-    *   **Skill Learned:** Zero-Allocation programming. This is how high-frequency trading platforms and game engines are written.
-
-### B. The "Cryptree" Data Structure
+### A. The "Cryptree" Data Structure
 *   **The concept:** A File System is just a Tree.
 *   **The Code:** You will write a class `DirectoryNode` that contains `List<NodeLink>`.
 *   **The Challenge:** When you change a file deep in the tree (e.g., `/photos/2024/jan/party.jpg`), the Hash of `jan` changes. Which means the Hash of `2024` changes. Which means the Hash of `photos` changes.
 *   **Skill Learned:** **Recursive Data Structures** and **Merkle Proofs**. This is the fundamental technology behind Bitcoin and Git.
 
-### C. The Network Protocol (RPC)
+### B. The Network Protocol (RPC)
 *   **The Concept:** The Frontend needs to say "Give me Block X".
 *   **The Code:** You won't just use standard REST (`GET /files/1`). You will implement a 'Content-Addressed' API: `GET /blocks/{hash}`.
 *   **Skill Learned:** Designing APIs that are **Idempotent** and **Cacheable**. Because blocks never change, you can cache them forever.
