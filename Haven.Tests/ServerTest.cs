@@ -29,7 +29,7 @@ public class ServerTest : IClassFixture<WebApplicationFactory<Program>>
         var json = await uploadResponse.Content.ReadAsStringAsync();
 
         // extract cid
-        var cid = json.Split(":")[2].Trim('"', ' ', '}');
+        var cid = json.Split(":")[2].Trim('"', ' ', '}'); //message....message data....json.....ithink thats it
 
         // Act download
         var downloadresponse = await _client.GetAsync($"api/block/{cid}");
