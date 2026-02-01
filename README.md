@@ -1,2 +1,2 @@
 # Haven
-What if you could transfer data through the web but like blockchains. Web doesn't know what the data is but thats the fun. Plus the server never receives your password for the application. Its all secured, until you lose your password(Then it becomes a bit too secured).
+Haven architecture treats the web like a blockchain, trustless, opaque, and immutable. It transfers data through the web without the server ever knowing what it is carrying. Your password never leaves your device, meaning the system is secure by mathematics, not by some company policy. It is perfectly secure. Until you LOSE your password, at which point it becomes mathematically impossible to recover, I mean safety at its peak no.
