@@ -8,6 +8,27 @@ const KEY_SIZE = 32;
 const NONCE_SIZE = 24; //chacha20
 
 export const CryptoLib = {
+    Identity: {
+        deriveKeyPair: async (password: string, saltHex: string) => {
+            await _sodium.ready;
+            const salt = sodium.from_hex(saltHex);
+
+            const seed = sodium.crypto_pwhash(
+                sodium.crypto_sign_SEEDBYTES,
+                password,
+                salt,
+                sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+                sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+                sodium.crypto_pwhash_ALG_ARGON2ID13
+            )
+
+            return sodium.crypto_sign_seed_keypair(seed);
+        },
+        sign: async (message: Uint8Array, privateKey: Uint8Array) => {
+            await _sodium.ready;
+            return sodium.crypto_sign_detached(message, privateKey);
+        }
+    },
     Encryption: {
         generateKey: async () => {
             await _sodium.ready;
