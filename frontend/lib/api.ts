@@ -12,12 +12,12 @@ export const api ={
     blocks: {
         async upload(encryptData: Uint8Array): Promise<string>{
             const hash = CryptoLib.Hash.sha256(encryptData);
-            const cid = CryptoLib.Utils.ToHex(hash);
+            const cid = CryptoLib.Utils.ToHex(await hash);
 
             // upload via axios
             const response = await client.post('/blocks', encryptData, {
                 headers: {
-                    'Content-Type' : 'application-stream',
+                    'Content-Type' : 'application/octet-stream',
                     'X-Haven-CID': cid
                 }
             });

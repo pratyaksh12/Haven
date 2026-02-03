@@ -1,21 +1,21 @@
 'use client';
 
 import { UploadDropzone } from '@/components/uploadDropzone';
+import { useFileBrowser } from '@/hooks/useFileBrowser';
 import { useFileUpload } from '@/hooks/userFileUpload';
 import { MoreVertical, FileText, Image as ImageIcon, Music, Lock, Plus, File } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function VaultPage() {
 
-  const { uploadFile, uploads, isProcessing } = useFileUpload();
+  const {files, addFile} = useFileBrowser();
+  const { uploadFile, uploads, isProcessing, lastUploadedNode } = useFileUpload();
   
-
-  // Mock Data
-  const files = [
-    { id: 1, name: 'Project_Alpha_Specs.pdf', type: 'pdf', size: '2.4 MB', date: '2 hrs ago', encrypted: true },
-    { id: 2, name: 'Q4_Financials.xlsx', type: 'sheet', size: '1.8 MB', date: 'Yesterday', encrypted: true },
-    { id: 3, name: 'design_mockup_v2.png', type: 'image', size: '4.2 MB', date: '3 days ago', encrypted: true },
-    { id: 4, name: 'meeting_notes.txt', type: 'text', size: '12 KB', date: '1 week ago', encrypted: false },
-  ];
+  useEffect(() => {
+    if (lastUploadedNode) {
+        addFile(lastUploadedNode);
+    }
+  }, [lastUploadedNode, addFile]);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -34,8 +34,8 @@ export default function VaultPage() {
       
       {/* File Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {files.map((file) => (
-          <FileCard key={file.id} file={file} />
+        {files.map((file, idx) => (
+          <FileCard key={idx} file={file} />
         ))}
         <UploadDropzone onUpload={uploadFile} isProcessing={isProcessing} />
       </div>

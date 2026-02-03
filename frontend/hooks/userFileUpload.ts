@@ -1,7 +1,7 @@
 import { api } from "@/lib/api";
 import { CryptoLib } from "@/lib/crypto";
 import { useCallback, useState } from "react";
-import { FileSystem } from '@/lib/filesystem';
+import { FileNode, FileSystem } from '@/lib/filesystem';
 import { Key } from "lucide-react";
 
 const CHUNK_SIZE = 1024 * 1024;
@@ -16,6 +16,7 @@ export interface UploadProgress {
 export function useFileUpload() {
     const [uploads, setUploads] = useState(<Record<string, UploadProgress>>({}));
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
+    const [fileNode, setFileNode] = useState<FileNode | null>(null)
 
     const updateStatus = useCallback((fileName: string, update: Partial<UploadProgress>) => {
         setUploads(prev => ({
@@ -53,11 +54,11 @@ export function useFileUpload() {
                 const chunkData = new Uint8Array(arrayBuffer);
 
                 // encrypt the chunk
-                const encryptedChunk = CryptoLib.encrypt(chunkData, fileKey);
+                const encryptedChunk = CryptoLib.encrypt(chunkData, await fileKey);
 
                 // ~~TODO: have to send the data to the backend~~ impolementation completed
-                const cid = await api.blocks.upload(encryptedChunk); // return cid -> store it now generate key
-                chunks.push(cid); 
+                const cid = await api.blocks.upload(await encryptedChunk); // return cid -> store it now generate key
+                chunks.push(cid);
 
                 //got it from reddit
                 byteProcessed += chunkData.length;
@@ -75,7 +76,8 @@ export function useFileUpload() {
                 await new Promise(r => setTimeout(r, 50));
             }
 
-            const fileNode = FileSystem.createFileNode(file.name, file.size, file.type, chunks, fileKey);
+            const fileNode = FileSystem.createFileNode(file.name, file.size, file.type, chunks, await fileKey);
+            setFileNode(fileNode);
             const nodeBytes = FileSystem.serialize(fileNode);
             // i'll encrypt this as well in later releases
 
@@ -83,7 +85,7 @@ export function useFileUpload() {
             console.log(`File Uploaded! Root CID: ${finalCid}`);
             updateStatus(fileName, { status: 'completed', progress: 100 });
 
-            
+
         } catch (err: any) {
             console.error(err);
             updateStatus(fileName, { status: 'error' })
@@ -92,7 +94,7 @@ export function useFileUpload() {
         }
     }, [updateStatus]);
 
-    return { uploadFile, uploads, isProcessing };
+    return { uploadFile, uploads, isProcessing, lastUploadedNode: fileNode };
 
 
 }
