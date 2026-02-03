@@ -15,7 +15,7 @@ export const api ={
             const cid = CryptoLib.Utils.ToHex(await hash);
 
             // upload via axios
-            const response = await client.post('/blocks', encryptData, {
+            const response = await client.post('api/block', encryptData, {
                 headers: {
                     'Content-Type' : 'application/octet-stream',
                     'X-Haven-CID': cid

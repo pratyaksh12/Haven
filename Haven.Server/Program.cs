@@ -6,6 +6,14 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+    });
+});
+
 builder.Services.AddControllers();
 var data = Path.Combine(Directory.GetCurrentDirectory(), "Data");
 builder.Services.AddSingleton<IBlockStorage>(new FileBlockStorage(data));
@@ -30,6 +38,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 );
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");
+
 app.MapControllers();
 app.UseAuthentication();
 app.UseAuthentication();
