@@ -1,3 +1,4 @@
+import { api } from "@/lib/api";
 import { CryptoLib } from "@/lib/crypto";
 import { useCallback, useState } from "react";
 
@@ -52,6 +53,7 @@ export function useFileUpload() {
                 const encryptedChunk = CryptoLib.encrypt(chunkData, fileKey);
 
                 // TODO: have to send the data to the backend
+                await api.blocks.upload(encryptedChunk);
 
 
                 //got it from reddit
