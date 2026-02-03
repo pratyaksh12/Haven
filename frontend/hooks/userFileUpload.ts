@@ -1,6 +1,8 @@
 import { api } from "@/lib/api";
 import { CryptoLib } from "@/lib/crypto";
 import { useCallback, useState } from "react";
+import { FileSystem } from '@/lib/filesystem';
+import { Key } from "lucide-react";
 
 const CHUNK_SIZE = 1024 * 1024;
 
@@ -39,6 +41,7 @@ export function useFileUpload() {
             const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
             let byteProcessed = 0;
             const startTime = Date.now();
+            const chunks: string[] = []; //string CIDs
 
             for (let i = 0; i < totalChunks; i++) {
                 const start = i * CHUNK_SIZE;
@@ -52,9 +55,9 @@ export function useFileUpload() {
                 // encrypt the chunk
                 const encryptedChunk = CryptoLib.encrypt(chunkData, fileKey);
 
-                // TODO: have to send the data to the backend
-                await api.blocks.upload(encryptedChunk);
-
+                // ~~TODO: have to send the data to the backend~~ impolementation completed
+                const cid = await api.blocks.upload(encryptedChunk); // return cid -> store it now generate key
+                chunks.push(cid); 
 
                 //got it from reddit
                 byteProcessed += chunkData.length;
@@ -71,7 +74,16 @@ export function useFileUpload() {
 
                 await new Promise(r => setTimeout(r, 50));
             }
+
+            const fileNode = FileSystem.createFileNode(file.name, file.size, file.type, chunks, fileKey);
+            const nodeBytes = FileSystem.serialize(fileNode);
+            // i'll encrypt this as well in later releases
+
+            const finalCid = await api.blocks.upload(nodeBytes);
+            console.log(`File Uploaded! Root CID: ${finalCid}`);
             updateStatus(fileName, { status: 'completed', progress: 100 });
+
+            
         } catch (err: any) {
             console.error(err);
             updateStatus(fileName, { status: 'error' })
