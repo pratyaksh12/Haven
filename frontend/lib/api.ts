@@ -23,6 +23,13 @@ export const api ={
             });
 
             return response.data.cid || cid
+        },
+        async download(cid: string): Promise<Uint8Array>{
+            const response = await client.get(`api/block/${cid}`, {
+                responseType: 'arraybuffer'
+            })
+
+            return  new Uint8Array(response.data);
         }
     }
 }
