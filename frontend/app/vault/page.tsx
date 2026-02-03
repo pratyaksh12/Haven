@@ -1,8 +1,14 @@
 'use client';
 
+import { UploadDropzone } from '@/components/uploadDropzone';
+import { useFileUpload } from '@/hooks/userFileUpload';
 import { MoreVertical, FileText, Image as ImageIcon, Music, Lock, Plus, File } from 'lucide-react';
 
 export default function VaultPage() {
+
+  const { uploadFile, uploads, isProcessing } = useFileUpload();
+  
+
   // Mock Data
   const files = [
     { id: 1, name: 'Project_Alpha_Specs.pdf', type: 'pdf', size: '2.4 MB', date: '2 hrs ago', encrypted: true },
@@ -31,16 +37,7 @@ export default function VaultPage() {
         {files.map((file) => (
           <FileCard key={file.id} file={file} />
         ))}
-        
-        {/* Upload Card - Placeholder for Drozone */}
-        <button className="h-65 border-2 border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center text-gray-500 hover:border-blue-500/50 hover:text-blue-400 hover:bg-blue-500/5 transition-all group relative overflow-hidden">
-            <div className="absolute inset-0 bg-linear-to-br from-blue-500/0 via-blue-500/0 to-blue-500/0 group-hover:from-blue-500/5 group-hover:to-cyan-500/5 transition-all duration-500" />
-            <div className="w-16 h-16 rounded-2xl bg-white/5 group-hover:bg-blue-500/20 flex items-center justify-center mb-4 transition-all group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] border border-white/5 group-hover:border-blue-500/30">
-                <Plus className="w-8 h-8" strokeWidth={2} />
-            </div>
-            <span className="font-semibold text-base relative z-10">Upload File</span>
-            <span className="text-xs text-gray-600 mt-1 relative z-10">or drag and drop</span>
-        </button>
+        <UploadDropzone onUpload={uploadFile} isProcessing={isProcessing} />
       </div>
     </div>
   );
