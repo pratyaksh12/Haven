@@ -67,7 +67,7 @@ export default function LoginPage() {
             <h1 className="text-5xl font-bold leading-tight mb-6 text-white">
               Your Files.
               <br />
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-[#0066ff] to-white">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-accent-primary to-white">
                 Only You Can Read Them.
               </span>
             </h1>
