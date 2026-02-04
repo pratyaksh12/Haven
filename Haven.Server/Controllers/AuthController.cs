@@ -35,7 +35,7 @@ namespace Haven.Server.Controllers
             if(user is null)
             {
                 // new user 
-                var salt = RandomNumberGenerator.GetBytes(32);
+                var salt = RandomNumberGenerator.GetBytes(16);
                 user = new UserRecord()
                 {
                     Username = username,

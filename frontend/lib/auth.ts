@@ -1,5 +1,6 @@
 import axios from "axios"
 import { CryptoLib } from "./crypto";
+import { Console } from "console";
 
 const BASE_API = 'http://localhost:5259/api/auth'
 
@@ -9,6 +10,7 @@ const client = axios.create({
 
 export const AuthService = {
     login: async (username: string, password: string) => {
+
         const response = await client.get(`salt/${username}`);
 
         const keyPair = await CryptoLib.Identity.deriveKeyPair(password, response.data.salt);
@@ -28,6 +30,8 @@ export const AuthService = {
 
         const token = verifyRes.data.token;
         localStorage.setItem('haven_token', token);
-        return token;
+    },
+    logout: () => {
+        localStorage.removeItem('haven_token');
     }
 }

@@ -32,7 +32,6 @@ export default function LoginPage() {
     setProgress({ step: "Tapping the server...", percentage: 10 });
     await new Promise((r) => setTimeout(r, 600));
 
-    // Script key derivation
     setProgress({ step: "Deriving cryptographic keys...", percentage: 40 });
     await new Promise((r) => setTimeout(r, 1200));
 
@@ -40,17 +39,15 @@ export default function LoginPage() {
     setProgress({ step: "Signing Proof...", percentage: 90 });
     await new Promise((r) => setTimeout(r, 600));
 
-    await login(username, password);
+    const success = await login(username, password);
 
-    if(error){
-        //failure
-        setProgress({step: "something is not right...", percentage: 100});
-        await new Promise((r) => setTimeout(r, 500));
+    if(!success){
+        setProgress({step: "Connection Failed.", percentage: 100});
+        await new Promise((r) => setTimeout(r, 2000));
+        setProgress(undefined);
     }else{
-        // Success
         setProgress({ step: "Unlocking Secret Vault....", percentage: 100 });
         await new Promise((r) => setTimeout(r, 500));
-        router.push("/vault");
     }
 
   }
@@ -167,7 +164,7 @@ export default function LoginPage() {
                   </div>
                 )}
                 {/* Progress / Submit */}
-                {isLoading && progress ? (
+                {progress ? (
                   <div className="bg-vault-bg rounded-lg p-4 border border-vault-border space-y-3 animate-in fade-in zoom-in duration-300">
                     <div className="flex justify-between text-xs font-medium text-accent-primary">
                       <span>{progress.step}</span>

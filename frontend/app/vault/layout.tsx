@@ -6,9 +6,12 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
+import { LogOut } from 'lucide-react';
 
 export default function VaultLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black flex text-gray-100 font-sans selection:bg-blue-500/30">
@@ -75,9 +78,12 @@ export default function VaultLayout({ children }: { children: React.ReactNode })
                <LayoutGrid size={20} />
              </button>
              
-             <button className="bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 border border-white/10">
-               <Plus size={18} strokeWidth={2.5} />
-               <span>New Upload</span>
+             <button 
+               onClick={logout}
+               className="bg-red-500/10 hover:bg-red-500/20 text-red-500 px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-red-500/20 transition-all active:scale-95"
+             >
+               <LogOut size={18} />
+               <span>Log Out</span>
              </button>
 
              <button className="ml-2 w-9 h-9 rounded-full bg-linear-to-br from-purple-500 to-pink-500 border-2 border-slate-900 ring-2 ring-white/5 shadow-lg" />

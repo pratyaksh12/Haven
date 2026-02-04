@@ -1,5 +1,5 @@
 // import { generateKey } from 'crypto';
-import _sodium from 'libsodium-wrappers';
+import _sodium from 'libsodium-wrappers-sumo';
 
 
 export const sodium = _sodium;
@@ -11,7 +11,8 @@ export const CryptoLib = {
     Identity: {
         deriveKeyPair: async (password: string, saltHex: string) => {
             await _sodium.ready;
-            const salt = sodium.from_hex(saltHex);
+            const saltBytes = sodium.from_hex(saltHex);
+            const salt = saltBytes.subarray(0, sodium.crypto_pwhash_SALTBYTES);
 
             const seed = sodium.crypto_pwhash(
                 sodium.crypto_sign_SEEDBYTES,

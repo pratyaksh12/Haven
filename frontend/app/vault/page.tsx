@@ -20,6 +20,7 @@ export default function VaultPage() {
   const { files, addFile } = useFileBrowser();
   const { uploadFile, uploads, isProcessing, lastUploadedNode } =
     useFileUpload();
+  /* Removed LogOut and useAuth imports */
   const { downloadFile, isDownloading } = useFileDownload();
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function VaultPage() {
             </span>
           </div>
         </div>
+
       </div>
 
       {/* File Grid */}
