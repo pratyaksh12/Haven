@@ -1,4 +1,5 @@
 "use client";
+import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, CheckCircle2, ShieldCheck, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -12,9 +13,9 @@ export default function LoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [progress, setProgress] = useState<{step: string, percentage: number}>();
   const [step, setStep] = useState<"identify" | "decrypting">("identify");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [progress, setProgress] = useState<progressInfo | null>(null);
+  const {login, isLoading, error} = useAuth();
 
   function getAvatarGradient(name: string) {
     if (!name) return "bg-vault-surface";
@@ -27,8 +28,6 @@ export default function LoginPage() {
 
   async function handleLogin(e: React.SyntheticEvent) {
     e.preventDefault();
-    setLoading(true);
-
     // Salt retrieval
     setProgress({ step: "Tapping the server...", percentage: 10 });
     await new Promise((r) => setTimeout(r, 600));
@@ -41,11 +40,19 @@ export default function LoginPage() {
     setProgress({ step: "Signing Proof...", percentage: 90 });
     await new Promise((r) => setTimeout(r, 600));
 
-    // Success
-    setProgress({ step: "Unlocking Secret Vault....", percentage: 100 });
-    await new Promise((r) => setTimeout(r, 500));
+    await login(username, password);
 
-    router.push("/vault");
+    if(error){
+        //failure
+        setProgress({step: "something is not right...", percentage: 100});
+        await new Promise((r) => setTimeout(r, 500));
+    }else{
+        // Success
+        setProgress({ step: "Unlocking Secret Vault....", percentage: 100 });
+        await new Promise((r) => setTimeout(r, 500));
+        router.push("/vault");
+    }
+
   }
 
   return (
@@ -136,7 +143,7 @@ export default function LoginPage() {
                     }}
                     className="w-full bg-vault-bg border border-vault-border rounded-lg px-4 py-3 text-white placeholder-text-placeholder focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all"
                     placeholder="Username"
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </div>
                 <div
@@ -151,11 +158,16 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full bg-vault-bg border border-vault-border rounded-lg px-4 py-3 text-white placeholder-text-placeholder focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all"
                     placeholder="Password"
-                    disabled={!username || loading}
+                    disabled={!username || isLoading}
                   />
                 </div>
+                {error &&(
+                  <div className="p-3 rounded-lg bg-red-500/10 border-red-500/20 text-red-400 text-sm text-center">
+                    {error}
+                  </div>
+                )}
                 {/* Progress / Submit */}
-                {loading && progress ? (
+                {isLoading && progress ? (
                   <div className="bg-vault-bg rounded-lg p-4 border border-vault-border space-y-3 animate-in fade-in zoom-in duration-300">
                     <div className="flex justify-between text-xs font-medium text-accent-primary">
                       <span>{progress.step}</span>
