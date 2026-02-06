@@ -2,6 +2,7 @@ using System.Text;
 using Haven.Core.Storage;
 using Haven.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +19,12 @@ builder.Services.AddControllers();
 var data = Path.Combine(Directory.GetCurrentDirectory(), "Data");
 builder.Services.AddSingleton<IBlockStorage>(new FileBlockStorage(data));
 // add userRepository here
-builder.Services.AddSingleton<UserRepository>(new UserRepository(data));
+builder.Services.AddDbContext<HavenDbContext>(options =>
+{
+    options.UseSqlite(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    );
+});
 
 // jwt config
 var jwtKey = "SuperSecretKeyIGNOIDEAWHATTHISEXACTLYISBUTFORPRODUSEenvfiles";
@@ -39,11 +45,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 var app = builder.Build();
 
+// Auto-create DB on startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<HavenDbContext>();
+    db.Database.EnsureCreated();
+}
+
 app.UseCors("AllowAll");
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
-app.UseAuthentication();
-app.UseAuthentication();
 app.Run();
 
 public partial class Program { }
