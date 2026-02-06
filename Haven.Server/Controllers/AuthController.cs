@@ -5,8 +5,6 @@ using System.Text;
 using Haven.Core.Crypto;
 using Haven.Server.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using NSec.Cryptography;
@@ -121,7 +119,7 @@ namespace Haven.Server.Controllers
             var username = User.Identity?.Name;
             if(string.IsNullOrEmpty(username)) return Unauthorized();
 
-            var user = _db.Users.Find(username);
+            var user = await _db.Users.FindAsync(username);
             return Ok(new {rootCid = user?.RootCid});
         }
 

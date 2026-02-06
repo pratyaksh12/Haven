@@ -40,27 +40,29 @@ namespace Haven.Server.Controllers
             return Ok(new {message = $"marked {addCount} items for deletions."});
         }
 
-        [HttpDelete("gc")]
-        public async Task<IActionResult> RunGarbageCollector([FromQuery] int minutes = 10)
-        {
-            var threshold = DateTime.UtcNow.AddMinutes(-minutes);
-            var oldItems = _db.Trash.Where(trash => trash.DeleteAt < threshold).ToList();
+        // if you want to call like a forceful delete from the client sid this can be uncommented
 
-            int deleteCount = 0;
+        // [HttpDelete("gc")]
+        // public async Task<IActionResult> RunGarbageCollector([FromQuery] int minutes = 10)
+        // {
+        //     var threshold = DateTime.UtcNow.AddMinutes(-minutes);
+        //     var oldItems = _db.Trash.Where(trash => trash.DeleteAt < threshold).ToList();
 
-            foreach (var item in oldItems)
-            {
-                var path = Path.Combine("Data", item.Cid);
-                if (System.IO.File.Exists(path))
-                {
-                    System.IO.File.Delete(path);
-                    deleteCount++;
-                }
-                _db.Remove(item);
-            }
+        //     int deleteCount = 0;
 
-            await _db.SaveChangesAsync();
-            return Ok(new {deleted = deleteCount, message="garbage collection completed"});
-        }
+        //     foreach (var item in oldItems)
+        //     {
+        //         var path = Path.Combine("Data", item.Cid);
+        //         if (System.IO.File.Exists(path))
+        //         {
+        //             System.IO.File.Delete(path);
+        //             deleteCount++;
+        //         }
+        //         _db.Remove(item);
+        //     }
+
+        //     await _db.SaveChangesAsync();
+        //     return Ok(new {deleted = deleteCount, message="garbage collection completed"});
+        // }
     }
 }

@@ -16,9 +16,14 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
+
 var data = Path.Combine(Directory.GetCurrentDirectory(), "Data");
 builder.Services.AddSingleton<IBlockStorage>(new FileBlockStorage(data));
-// add userRepository here
+
+
+builder.Services.AddHostedService<GarbageCollectorService>();
+
+
 builder.Services.AddDbContext<HavenDbContext>(options =>
 {
     options.UseSqlite(
@@ -29,7 +34,6 @@ builder.Services.AddDbContext<HavenDbContext>(options =>
 // jwt config
 var jwtKey = "SuperSecretKeyIGNOIDEAWHATTHISEXACTLYISBUTFORPRODUSEenvfiles";
 var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
     options =>
     {
