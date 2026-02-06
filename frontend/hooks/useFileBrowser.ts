@@ -58,7 +58,8 @@ export function useFileBrowser() {
                 console.log("Filesystem: Decrypted bytes:", decryptedJsonBytes.length);
 
                 const nodes = FileSystem.deserialize(decryptedJsonBytes) as FileNode[];
-                console.log("Filesystem: Deserialized nodes:", nodes);
+                // console.log("Filesystem: Deserialized nodes:", nodes); // Security: Don't log full nodes
+                // console.log("Filesystem: Deserialized nodes:", nodes); // Security: Don't log full nodes
 
                 setFiles(nodes);
             } catch (e) {
@@ -70,11 +71,12 @@ export function useFileBrowser() {
         load();
     }, [])
 
-    useEffect(() => {
-        if (!isLoading) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(files));
-        }
-    }, [files, isLoading]);
+    // Removed LocalStorage caching for security. Files should only persist in encrypted blocks.
+    // useEffect(() => {
+    //     if (!isLoading) {
+    //         localStorage.setItem(STORAGE_KEY, JSON.stringify(files));
+    //     }
+    // }, [files, isLoading]);
 
     const addFile = useCallback(async (node: FileNode) => {
         const newFiles = [node, ...files]

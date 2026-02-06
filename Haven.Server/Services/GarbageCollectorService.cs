@@ -34,9 +34,8 @@ public class GarbageCollectorService(IServiceProvider serviceProvider, ILogger<G
 
         logger.LogInformation("running garbage collector...");
 
-        var threshold = DateTime.UtcNow.AddMinutes(-10);
-
-        var oldItems = await db.Trash.Where(t => t.DeleteAt < threshold).ToListAsync(stoppingToken);
+        // Fetch all items from trash
+        var oldItems = await db.Trash.ToListAsync(stoppingToken);
 
         if(oldItems.Count == 0){ 
             logger.LogInformation("garbage bin is empty");

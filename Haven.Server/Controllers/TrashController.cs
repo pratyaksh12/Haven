@@ -27,7 +27,7 @@ namespace Haven.Server.Controllers
             {
                 if(!_db.Trash.Any(t => t.Cid == cid))
                 {
-                    _db.Trash.Add(new TrashItem{Cid = cid, DeleteAt = DateTime.UtcNow});
+                    _db.Trash.Add(new TrashItem{Cid = cid});
                     addCount ++;
                 }
             }
@@ -42,27 +42,26 @@ namespace Haven.Server.Controllers
 
         // if you want to call like a forceful delete from the client sid this can be uncommented
 
-        // [HttpDelete("gc")]
-        // public async Task<IActionResult> RunGarbageCollector([FromQuery] int minutes = 10)
-        // {
-        //     var threshold = DateTime.UtcNow.AddMinutes(-minutes);
-        //     var oldItems = _db.Trash.Where(trash => trash.DeleteAt < threshold).ToList();
+        [HttpDelete("gc")]
+        public async Task<IActionResult> RunGarbageCollector()
+        {
+            var oldItems = _db.Trash.ToList();
 
-        //     int deleteCount = 0;
+            int deleteCount = 0;
 
-        //     foreach (var item in oldItems)
-        //     {
-        //         var path = Path.Combine("Data", item.Cid);
-        //         if (System.IO.File.Exists(path))
-        //         {
-        //             System.IO.File.Delete(path);
-        //             deleteCount++;
-        //         }
-        //         _db.Remove(item);
-        //     }
+            foreach (var item in oldItems)
+            {
+                var path = Path.Combine("Data", item.Cid);
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                    deleteCount++;
+                }
+                _db.Remove(item);
+            }
 
-        //     await _db.SaveChangesAsync();
-        //     return Ok(new {deleted = deleteCount, message="garbage collection completed"});
-        // }
+            await _db.SaveChangesAsync();
+            return Ok(new {deleted = deleteCount, message="garbage collection completed"});
+        }
     }
 }
