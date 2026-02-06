@@ -41,7 +41,7 @@ export class FileSystem{
         
     }
 
-    static deserialize(data: Uint8Array): FileNode | DirectoryNode{
+    static deserialize(data: Uint8Array): FileNode[] | DirectoryNode{
         const decoder = new TextDecoder('utf-8');
         const decodedResult=  decoder.decode(data);
         const jsonObject = JSON.parse(decodedResult);

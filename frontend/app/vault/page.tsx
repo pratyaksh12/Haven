@@ -18,16 +18,17 @@ import { useEffect } from "react";
 
 export default function VaultPage() {
   const { files, addFile } = useFileBrowser();
-  const { uploadFile, uploads, isProcessing, lastUploadedNode } =
+  const { uploadFile, uploads, isProcessing } =
     useFileUpload();
   /* Removed LogOut and useAuth imports */
   const { downloadFile, isDownloading } = useFileDownload();
 
-  useEffect(() => {
-    if (lastUploadedNode) {
-      addFile(lastUploadedNode);
+  const handleUpload = async (file: File) => {
+    const node = await uploadFile(file);
+    if(node) {
+        addFile(node);
     }
-  }, [lastUploadedNode, addFile]);
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -53,7 +54,7 @@ export default function VaultPage() {
         {files.map((file, idx) => (
           <FileCard key={idx} file={file} onDownload={() => downloadFile(file)} />
         ))}
-        <UploadDropzone onUpload={uploadFile} isProcessing={isProcessing} />
+        <UploadDropzone onUpload={handleUpload} isProcessing={isProcessing} />
       </div>
     </div>
   );

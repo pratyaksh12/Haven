@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Haven.Core.Crypto;
 using Haven.Server.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -96,6 +97,34 @@ namespace Haven.Server.Controllers
             return Unauthorized("Nah you really are fake.");
         }
 
+        [Authorize]
+        [HttpPut("root")]
+        public async Task<IActionResult> UpdateRoot([FromBody] UpdateRootRequest req)
+        {
+            var username = User.Identity?.Name;
+            if(string.IsNullOrEmpty(username)) return Unauthorized();
+
+            var user = await _db.Users.FindAsync(username);
+            if(user == null)return Unauthorized();
+
+            user.RootCid = req.RootCid;
+            await _db.SaveChangesAsync();
+
+            return Ok();
+
+        }
+
+        [Authorize]
+        [HttpGet("root")]
+        public async Task<IActionResult> GetRoot()
+        {
+            var username = User.Identity?.Name;
+            if(string.IsNullOrEmpty(username)) return Unauthorized();
+
+            var user = _db.Users.Find(username);
+            return Ok(new {rootCid = user?.RootCid});
+        }
+
         private string GenerateJwtToken(string username)
         {
             // I will put it in appsetting later
@@ -117,7 +146,12 @@ namespace Haven.Server.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
+}
+public class UpdateRootRequest
+{
+    public string RootCid { get; set; } = "";
 }
 
 public class LoginRequest

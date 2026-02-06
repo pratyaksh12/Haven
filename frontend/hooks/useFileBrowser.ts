@@ -1,23 +1,73 @@
-import { FileNode } from "@/lib/filesystem";
+import { AuthService } from "@/lib/auth";
+import { CryptoLib } from "@/lib/crypto";
+import { FileNode, FileSystem } from "@/lib/filesystem";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 
 const STORAGE_KEY = "haven_files_v1";
+const API_BASE = "http://localhost:5259/api"
 
 export function useFileBrowser() {
+    const router = useRouter();
     const [files, setFiles] = useState<FileNode[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
+        const load = async () => {
+            console.log("Filesystem: Starting load...");
+            setIsLoading(true);
             try {
-                setFiles(JSON.parse(saved));
+                const token = localStorage.getItem('haven_token');
+                if (!token) {
+                    console.log("Filesystem: No token found");
+                    return;
+                }
+
+                const rootRes = await axios.get(`${API_BASE}/auth/root`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                const rootCid = rootRes.data.rootCid;
+                console.log("Filesystem: Root CID fetched:", rootCid);
+
+                if (!rootCid) {
+                    console.log("Filesystem: No Root CID (New User)");
+                    setIsLoading(false);
+                    return; //new user empty file
+                }
+
+                console.log("Filesystem: Fetching block from:", `${API_BASE}/block/${rootCid}`);
+                const blockRes = await axios.get(`${API_BASE}/block/${rootCid}`, {
+                    responseType: `arraybuffer`//this was causing a bug
+                })
+                console.log("Filesystem: Block fetched, size:", blockRes.data.byteLength);
+
+                const encryptedData = new Uint8Array(blockRes.data);
+
+                const key = AuthService.getMasterKey();
+                if (!key) {
+                    console.error("Filesystem: Missing Master Key during load");
+                    router.push('/login');
+                    return;
+                }
+
+                console.log("Filesystem: Decrypting with key...");
+                const decryptedJsonBytes = await CryptoLib.decrypt(encryptedData, key);
+                console.log("Filesystem: Decrypted bytes:", decryptedJsonBytes.length);
+
+                const nodes = FileSystem.deserialize(decryptedJsonBytes) as FileNode[];
+                console.log("Filesystem: Deserialized nodes:", nodes);
+
+                setFiles(nodes);
             } catch (e) {
-                console.error("Failed to save files", e);
+                console.error("Filesystem: Load Failed", e);
+            } finally {
+                setIsLoading(false);
             }
         }
-        setIsLoading(false);
+        load();
     }, [])
 
     useEffect(() => {
@@ -26,9 +76,35 @@ export function useFileBrowser() {
         }
     }, [files, isLoading]);
 
-    const addFile = useCallback((node: FileNode) => {
-        setFiles(prev => [node, ...prev])
-    }, [])
+    const addFile = useCallback(async (node: FileNode) => {
+        const newFiles = [node, ...files]
+        setFiles(newFiles);
+
+        try {
+            const key = AuthService.getMasterKey();
+            if (!key) {
+                console.error("Cannot save missing master key please relogin");
+                return;
+            }
+
+            const jsonBytes = FileSystem.serialize(newFiles as any);
+
+            const encryptedData = await CryptoLib.encrypt(jsonBytes, key);
+
+            const uploadRes = await axios.post(`${API_BASE}/block`, encryptedData, {
+                headers: { 'Content-Type': 'application/octet-stream' }
+            });
+
+            const newCid = uploadRes.data.cid;
+
+            const token = localStorage.getItem('haven_token');
+            await axios.put(`${API_BASE}/auth/root`, { rootCid: newCid }, { headers: { Authorization: `Bearer ${token}` } });
+
+            console.log('Root Updated', newCid);
+        } catch (e) {
+            console.error("Failed to save persistence.");
+        }
+    }, [files]);
 
     return { files, addFile, isLoading };
 }

@@ -25,7 +25,7 @@ export function useFileUpload() {
         }))
     }, [])
 
-    const uploadFile = useCallback(async (file: File) => {
+    const uploadFile = useCallback(async (file: File): Promise<FileNode | null> => {
         const fileName = file.name;
 
         setUploads(prev => ({
@@ -84,17 +84,16 @@ export function useFileUpload() {
             const finalCid = await api.blocks.upload(nodeBytes);
             console.log(`File Uploaded! Root CID: ${finalCid}`);
             updateStatus(fileName, { status: 'completed', progress: 100 });
-
+            return fileNode;
 
         } catch (err: any) {
             console.error(err);
             updateStatus(fileName, { status: 'error' })
+            return null;
         } finally {
             setIsProcessing(false);
         }
     }, [updateStatus]);
 
     return { uploadFile, uploads, isProcessing, lastUploadedNode: fileNode };
-
-
 }
