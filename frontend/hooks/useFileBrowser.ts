@@ -106,5 +106,45 @@ export function useFileBrowser() {
         }
     }, [files]);
 
-    return { files, addFile, isLoading };
+    const deleteFile = async (fileToDelete: FileNode) => {
+        if (!confirm(`Are you sure you want to delete ${fileToDelete.name}. Once delted It CANNOT be recovered`)) return;
+
+        setIsLoading(true);
+
+        try {
+            const newFile = files.filter(f => f.name !== fileToDelete.name);
+
+            const key = AuthService.getMasterKey();
+            if (!key) {
+                router.push('/login');
+                return;
+            }
+
+            const jsonBytes = FileSystem.serialize(newFile as any);
+            const encryptionData = await CryptoLib.encrypt(jsonBytes, key);
+
+            const uploadRes = await axios.post(`${API_BASE}/block`, encryptionData, {
+                headers: { 'Content-Type': 'application/octet-stream' }
+            });
+            const newRootCid = uploadRes.data.cid;
+
+            const token = localStorage.getItem('haven_token');
+            const authConfig = { headers: { Authorization: `Bearer ${token}` } };
+            await axios.put(`${API_BASE}/auth/root`, { rootCid: newRootCid }, authConfig);
+
+            if (fileToDelete.chunks && fileToDelete.chunks.length > 0) {
+                await axios.post(`${API_BASE}/trash`, fileToDelete.chunks, authConfig);
+                console.log("files sent to trash");
+            }
+            setFiles(newFile);
+            console.log("deleted", fileToDelete.name);
+        } catch (e) {
+            console.error("deletion failed", e);
+        } finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    return { files, addFile, isLoading, deleteFile };
 }

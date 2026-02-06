@@ -13,22 +13,22 @@ import {
   Plus,
   File,
   DownloadIcon,
+  Trash2,
 } from "lucide-react";
-import { useEffect } from "react";
 
 export default function VaultPage() {
-  const { files, addFile } = useFileBrowser();
-  const { uploadFile, uploads, isProcessing } =
-    useFileUpload();
+  const { files, addFile, deleteFile } = useFileBrowser();
+  const { uploadFile, uploads, isProcessing } = useFileUpload();
   /* Removed LogOut and useAuth imports */
   const { downloadFile, isDownloading } = useFileDownload();
 
   const handleUpload = async (file: File) => {
     const node = await uploadFile(file);
-    if(node) {
-        addFile(node);
+    if (node) {
+      addFile(node);
     }
-  }
+  };
+
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -46,13 +46,17 @@ export default function VaultPage() {
             </span>
           </div>
         </div>
-
       </div>
 
       {/* File Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {files.map((file, idx) => (
-          <FileCard key={idx} file={file} onDownload={() => downloadFile(file)} />
+          <FileCard
+            key={idx}
+            file={file}
+            onDownload={() => downloadFile(file)}
+            onDelete={() => deleteFile(file)}
+          />
         ))}
         <UploadDropzone onUpload={handleUpload} isProcessing={isProcessing} />
       </div>
@@ -60,9 +64,12 @@ export default function VaultPage() {
   );
 }
 
-function FileCard({ file, onDownload }: { file: any; onDownload: () => void }) {
+function FileCard({ file, onDownload, onDelete }: { file: any; onDownload: () => void; onDelete: () => void }) {
   return (
-    <div className="group h-65 bg-linear-to-b from-slate-900/80 to-slate-950/80 border border-white/5 hover:border-blue-500/30 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 relative backdrop-blur-md hover:cursor-pointer" onClick={onDownload}>
+    <div
+      className="group h-65 bg-linear-to-b from-slate-900/80 to-slate-950/80 border border-white/5 hover:border-blue-500/30 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 relative backdrop-blur-md hover:cursor-pointer"
+      onClick={onDownload}
+    >
       {/* Thumbnail */}
       <div className="h-40 bg-linear-to-br from-slate-800/30 to-slate-900/30 relative flex items-center justify-center group-hover:from-slate-800/50 group-hover:to-slate-900/50 transition-all duration-500 overflow-hidden">
         <div
@@ -107,6 +114,9 @@ function FileCard({ file, onDownload }: { file: any; onDownload: () => void }) {
 
           <button className="text-gray-600 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors -mr-2">
             <MoreVertical size={16} />
+          </button>
+          <button onClick={(e) => { e.stopPropagation(); onDelete(); }} className="text-gray-400 hover:text-red-400 p-2 rounded-lg hover:bg-white/10 transition-colors">
+            <Trash2 size={16} />
           </button>
         </div>
       </div>
