@@ -111,3 +111,35 @@ sequenceDiagram
 - TailwindCSS
 - Lucide Icons
 - Libsodium.js (WASM Cryptography)
+
+## Getting Started
+
+### Prerequisites
+- .NET 9 SDK
+- Node.js 18+
+
+### Running the Backend
+1. Navigate to the server directory:
+   ```bash
+   cd Haven.Server
+   ```
+2. Run the server:
+   ```bash
+   dotnet run
+   ```
+   The API will start at `http://localhost:5259`.
+
+### Running the Frontend
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open `http://localhost:3000` in your browser.
